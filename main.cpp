@@ -1,6 +1,15 @@
 #include <iostream>
 #include <unistd.h>
 #include <vector>
+#include <deque>
+
+
+void print_vector(std::vector<int> vector) {
+  for (int i=0; i<vector.size(); i++) {
+    std::cout << vector[i] << " ";
+  }
+  std::cout << std::endl;
+}
 
 
 void render_map(int map_side_length, std::string map_string) {
@@ -43,105 +52,106 @@ void render_map(int map_side_length, std::string map_string) {
 }
 
 
-int main() {
+void render_map_new(int side_length, std::string map_string) {
 
-  // std::string filled_square = "\u2588";  // filled rectangle
+  // Define grid blocks or spaces. 2 characters are roughly square shape
+  std::string block = "\u2588\u2588";   // Solid block
+  std::string shade_block = "\u2592\u2592";   // Shaded block
+  std::string space = "  ";  // Empty space
 
-  int pause = 100000;  // pause in microseconds
-  int map_side_length = 8;
-  std::string filled_square = "X";
-  std::string map_string(map_side_length * map_side_length, ' ');
+  // Render horizontal edge, used at top and bottom of map
+  auto render_horizontal_edge = [](int side_length, std::string block) {
+    for (int row_num=0; row_num < side_length+2; row_num++) {
+      std::cout << block;
+    };
+    std::cout << std::endl;
+  };
 
-  int num_rows = map_side_length;
-  int row_length = map_side_length;
-  std::string map_string_row;
+  render_horizontal_edge(side_length, block);
 
-  
+  int ms_idx = 0;  // Index that runs through 'map_string'
+  char grid_box_item;  // What is in that grid box
+  for (int row_num=0; row_num < side_length; row_num++) {
+    std::cout << block;
+    for (int col_num=0; col_num < side_length; col_num++) {
 
-  for (int step=0; step<map_string.length(); step++) {
-
-    std::cout << "\x1b[2J\x1b[H";  // clear screen and move cursor to top
-
-    map_string.replace(step, 1, filled_square);
-    render_map(map_side_length, map_string);
-    map_string.replace(step, 1, " ");
-    usleep(pause);
+      // Render a block if the snake is there, otherwise a space
+      grid_box_item = map_string[ms_idx];
+      if (grid_box_item == 'H') {std::cout << block;}
+      else if (grid_box_item == 'S') {std::cout << shade_block;}
+      else {std::cout << space;};
+      ms_idx++;
+    }
+    std::cout << block;
+    std::cout << std::endl;
   }
 
+  render_horizontal_edge(side_length, block);
+
+}
 
 
+std::string get_map_string_from_snake(int side_length, std::deque<int> snake) {
+
+  // Create string that defines the map
+  int map_string_length = side_length * side_length;
+  std::string map_string(map_string_length, ' ');
   
+  int m_idx;  // Index used for map_string
+
+  // Add 'H' at the snake's head
+  m_idx = snake[0];
+  map_string[m_idx] = 'H';
+
+  // Add 'S' at the snake's other locations
   
-  
-  // std::string map_string_row;
-  // std::cout << '+' << horizontal_edge << '+' << std::endl;
-  // for (int row_num=0; row_num<map_side_length; row_num++) {
-  //   map_string_row = map_string_repeated.substr(row_num * map_side_length, 2*map_side_length);
-  //   std::cout << '|' << map_string_row << '|' << std::endl;
-  // }
-  // std::cout << '+' << horizontal_edge << '+' << std::endl;
+  for (int s_idx=1; s_idx < snake.size(); s_idx++) {
+    m_idx = snake[s_idx];
+    map_string[m_idx] = 'S';
+  }
 
-
-
-
-  // for (int i=0; i<10; i++) {
-  
-  //   sleep(pause);
-  //   printf("%d\n", i);
-  // };
-  // return 0;
+  return map_string;
 }
 
 
 
 
 
-// #include <iostream>
-// #include <string.h>
-// #include <math.h>
-// #include <unistd.h>
-// using namespace std;
 
-// int _main() {
-//     float A = 0, B = 0;
-//     float i, j;
-//     int k;
-//     float z[1760];
-//     char b[1760];
-//     printf("\x1b[2J");
-//     for(;;) {
-//         memset(b,32,1760);
-//         memset(z,0,7040);
-//         for(j=0; j < 6.28; j += 0.07) {
-//             for(i=0; i < 6.28; i += 0.02) {
-//                 float c = sin(i);
-//                 float d = cos(j);
-//                 float e = sin(A);
-//                 float f = sin(j);
-//                 float g = cos(A);
-//                 float h = d + 2;
-//                 float D = 1 / (c * h * e + f * g + 5);
-//                 float l = cos(i);
-//                 float m = cos(B);
-//                 float n = sin(B);
-//                 float t = c * h * g - f * e;
-//                 int x = 40 + 30 * D * (l * h * m - t * n);
-//                 int y= 12 + 15 * D * (l * h * n + t * m);
-//                 int o = x + 80 * y;
-//                 int N = 8 * ((f * e - c * d * g) * m - c * d * e - f * g - l * d * n);
-//                 if(22 > y && y > 0 && x > 0 && 80 > x && D > z[o]) {
-//                     z[o] = D;
-//                     b[o] = "...,,,ooo000"[N > 0 ? N : 0]; //works much better with ".,-~:;=!*#$@" or "JackEatDonut"
-//                 }
-//             }
-//         }
-//         printf("\x1b[H");
-//         for(k = 0; k < 1761; k++) {
-//             putchar(k % 80 ? b[k] : 10);
-//             A += 0.00004;
-//             B += 0.00002;
-//         }
-//         usleep(30000);
-//     }
-//     return 0;
-// }
+
+int main() {
+
+  int pause = 100000;  // pause in microseconds
+  int side_length = 10;
+
+  std::deque<int> snake;
+  snake.push_front(0);
+  snake.push_front(1);
+  snake.push_front(2);
+  snake.push_front(3);
+
+  std::string map_string = get_map_string_from_snake(side_length, snake);
+  render_map_new(side_length, map_string);
+
+  
+  
+  
+  
+  // std::string filled_square = "X";
+  // std::string map_string(map_side_length * map_side_length, ' ');
+
+  // int num_rows = map_side_length;
+  // int row_length = map_side_length;
+  // std::string map_string_row;
+
+  
+
+  // for (int step=0; step<map_string.length(); step++) {
+
+  //   std::cout << "\x1b[2J\x1b[H";  // clear screen and move cursor to top
+
+  //   map_string.replace(step, 1, filled_square);
+  //   render_map(map_side_length, map_string);
+  //   map_string.replace(step, 1, " ");
+  //   usleep(pause);
+  }
