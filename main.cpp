@@ -4,46 +4,99 @@
 #include <deque>
 
 
-
-// std::string get_map_string_from_snake(
-//   int map_side_length, std::deque<int> snake
-// ) {
-
-//   // Create string defining map, add 'H' at snake's head and 'S' at body points
-//   std::string map_string(map_side_length * map_side_length, ' ');
-//   map_string[snake[0]] = 'H';
-//   for (int i=1; i<snake.size(); i++) {map_string[snake[i]] = 'S'};
-  
-//   return map_string;
-// }
+void print_deque(std::deque<int> mydeque) {
+  for (auto i : mydeque) {
+    std::cout << i << " ";
+  }
+  std::cout << std::endl;
+}
 
 
+class Snake {
+
+  private:
+
+    int map_side_length;
+    char direction;
+    int head_location;
+    std::deque<int> locations;
+
+    void update_head_location() {
+      if (direction == 'L') {
+        if (head_location % map_side_length == 0) {
+          head_location += map_side_length - 1;
+        }
+        else {
+          head_location -= 1;
+        }
+      }
+      else if (direction == 'R') {
+        if (head_location % map_side_length == map_side_length - 1) {
+          head_location -= map_side_length - 1;
+        }
+        else {
+          head_location += 1;
+        }
+      }
+      else if (direction == 'U') {
+        if (head_location / map_side_length == 0) {
+          head_location += (map_side_length - 1) * map_side_length;
+        }
+        else {
+          head_location -= map_side_length;
+        }
+      }
+      else if (direction == 'D') {
+        head_location += map_side_length;
+      };
+
+      // Keep the snake on the map
+      head_location = head_location % (map_side_length * map_side_length);
+    }
+
+  public:
+
+    Snake(int map_side_length) : map_side_length(map_side_length) {
+      // Initialise snake, in the middle of the grid and facing right
+      direction = 'R';
+      head_location = {
+        map_side_length * (int)(map_side_length / 2)
+        + (int)(map_side_length / 2)
+      };
+      locations.push_front(head_location-1);
+      locations.push_front(head_location);
+    };
+
+    void update_direction(char direction_input) {
+      if (direction == 'L' || direction == 'R') {
+        if (direction_input == 'U' || direction_input == 'D') {
+          direction = direction_input;
+        }
+      }
+      else if (direction == 'U' || direction == 'D') {
+        if (direction_input == 'L' || direction_input == 'R') {
+          direction = direction_input;
+        }
+      }
+    };
+
+    void update_location(bool grow=false) {
+      // Update snake's location deque after a step forward
+      update_head_location();
+      locations.push_front(head_location);
+      if (not grow) {
+        locations.pop_back();
+      }
+      
+    }
+
+    // Get snake's grid locations -- first entry is head, others are body
+    std::deque<int> get_locations() {
+      return locations;
+    };
 
 
-
-// class Snake {
-
-//   private:
-//     int map_side_length;
-//     char direction;
-//     std::deque<int> locations;
-
-//   public:
-
-//     Snake(int map_side_length) : map_side_length(map_side_length) {
-//       direction = 'R';
-//       int head_start_location = {
-//         map_side_length * (int)(map_side_length / 2)
-//         + (int)(map_side_length / 2) 
-//         + 1
-//       };
-//       locations.push_front(head_start_location);
-//     };
-
-//     std::deque<int> get_snake_locations() {
-//       return locations;
-//     };
-// };
+};
 
 
 class Map {
@@ -54,6 +107,22 @@ class Map {
     std::string shade_block = "\u2593\u2593";
     std::string space = "  ";
     std::string map_string;  // Contains what is at each grid location
+
+    // Update string that defines map
+    void update_map_string(Snake snake) {
+
+      // Reset map string  // TODO: Do this more efficiently?
+      for (int i=0; i<map_string.length(); i++) {
+        map_string[i] = ' ';
+      }
+
+      // Get snake's locations and add them
+      std::deque<int> snake_locations = snake.get_locations();
+      map_string[snake_locations[0]] = 'H';  // Add snake's head
+      for (int i=1; i<snake_locations.size(); i++) {
+        map_string[snake_locations[i]] = 'S';  // Add snake's body
+      };
+    };
 
     // Render horizontal edge, used at top and bottom of map
     void render_horizontal_edge () {
@@ -67,7 +136,8 @@ class Map {
       map_string.insert(0, map_side_length * map_side_length, ' ');
     }
 
-    void render() {
+    void render(Snake snake) {
+      update_map_string(snake);
       render_horizontal_edge();
       int ms_idx = 0;  // Index that runs through 'map_string'
       char grid_box_item;  // What is in that grid box
@@ -93,49 +163,43 @@ class Map {
 
 int main() {
 
-  // int pause = 50000;  // pause in microseconds
-  const int map_side_length = 21;  // keep odd so map has a middle
+  // Map properties
+  const int map_side_length = 11;  // keep odd so map has a middle
 
+  // Run properties
+  int pause = 500000;  // pause in microseconds
+  int num_ts = 1000;
+
+  Snake snake(map_side_length);
   Map map(map_side_length);
-  map.render();
-
-
-  // std::string map_string;
-  // for (int time_step=0; time_step<100; time_step++) {
-  //   std::cout << "\x1b[2J\x1b[H";  // clear screen and move cursor to top
-
-  //   // Render the snake
-  //   map_string = get_map_string_from_snake(map_side_length, snake);
-  //   render_map(map_side_length, map_string);
-
-  //   // Move the snake
-  //   head_location = (head_location + 1) % map_side_length;
-  //   snake.push_front(head_location);
-  //   snake.pop_back();
-  //   usleep(pause);
-  // }
-
+  bool grow;
   
 
-  
-  
-  
-  
-  // std::string filled_square = "X";
-  // std::string map_string(map_map_side_length * map_map_side_length, ' ');
-
-  // int num_rows = map_map_side_length;
-  // int row_length = map_map_side_length;
-  // std::string map_string_row;
-
-  
-
-  // for (int step=0; step<map_string.length(); step++) {
-
-  
-
-  //   map_string.replace(step, 1, filled_square);
-  //   render_map(map_map_side_length, map_string);
-  //   map_string.replace(step, 1, " ");
-  //   usleep(pause);
+  for (int step=0; step<num_ts; step++) {
+    std::cout << "\x1b[2J\x1b[H";  // clear screen and move cursor to top
+    map.render(snake);
+    grow = step % 8 == 0;
+    if (step % 7 == 2) {snake.update_direction('U');}
+    snake.update_location(grow);
+    usleep(pause);
   }
+
+};
+
+
+// #include<iostream>
+// #include<stdio.h>
+// int main() {
+//     char c;
+//    // Set the terminal to raw mode
+//     system("stty raw");
+//     while(1) {
+//         c = getchar();
+//         // terminate when "." is pressed
+//         if(c == '.') {
+//             system("stty cooked");
+//             exit(0);
+//         }  
+//         std::cout << c << std::endl;
+//     }
+// }
