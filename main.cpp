@@ -1,7 +1,10 @@
 #include <iostream>
 #include <unistd.h>
+#include <stdio.h>
+#include <time.h>
 #include <vector>
 #include <deque>
+#include <thread>
 
 
 void print_deque(std::deque<int> mydeque) {
@@ -111,7 +114,7 @@ class Map {
     // Update string that defines map
     void update_map_string(Snake snake) {
 
-      // Reset map string  // TODO: Do this more efficiently?
+      // Reset map string
       for (int i=0; i<map_string.length(); i++) {
         map_string[i] = ' ';
       }
@@ -160,20 +163,36 @@ class Map {
 };
 
 
+void get_clock_ticks(int Z) {
+    for (int i = 0; i < Z; i++) {
+        std::cout << "Tick " << i << std::endl;
+        usleep(1000000);
+    }
+}
 
-int main() {
+
+void print_input_back() {
+    char x;
+    std::cin >> x;
+    std::cout << "User input is " << x << std::endl;
+}
+
+
+void play_game() {
 
   // Map properties
   const int map_side_length = 11;  // keep odd so map has a middle
 
   // Run properties
-  int pause = 500000;  // pause in microseconds
-  int num_ts = 1000;
+  int pause = 1000000;  // pause in microseconds
+  int num_ts = 10;
+
+  char command;
+  std::deque<int> command_list;
 
   Snake snake(map_side_length);
   Map map(map_side_length);
   bool grow;
-  
 
   for (int step=0; step<num_ts; step++) {
     std::cout << "\x1b[2J\x1b[H";  // clear screen and move cursor to top
@@ -184,22 +203,65 @@ int main() {
     usleep(pause);
   }
 
+  // char c;
+  // // Set the terminal to raw mode
+  // system("stty raw");
+  // while(1) {
+  //     c = getchar();
+  //     // terminate when '.' is pressed
+  //     if(c == '.') {
+  //         system("stty cooked");
+  //         std::cout << std::endl;
+  //         exit(0);
+  //     }  
+  //     std::cout << c << "\033[A" << std::endl;  // print c and move cursor up
+}
+
+
+
+int main() {
+
+  char c;
+  bool game_live;
+  const int num_rounds = 10;
+  int round_num;
+
+  game_live = true;
+
+  // // Thread that measures time go by
+  // std::thread ticker(get_clock_ticks, 10);
+  // usleep(500000);
+
+  std::deque<int> command_list;
+
+  // Set terminal to raw mode to read input without having to press ENTER
+  system("stty raw");
+  round_num = 0;
+  while(game_live) {
+    command_list.push_front(round_num);
+    std::cout << "Hello " << round_num << "\r" << std::endl;
+    print_deque(command_list);
+    usleep(1000000);
+    round_num++;
+    command_list.pop_back();
+    if (round_num > num_rounds) {
+      game_live = false;
+    }
+  }
+  system("stty cooked");
+
+  
+
+  // usleep(500000);
+  // for (int i=0; i<10; i++) {
+  //   print_input_back();
+  // }
+  // std::thread th2(func_thread2, 3);
+
+  // Wait for the threads to finish
+  // ticker.join();
+  // th2.join();
+
+  return 0;
+
 };
-
-
-// #include<iostream>
-// #include<stdio.h>
-// int main() {
-//     char c;
-//    // Set the terminal to raw mode
-//     system("stty raw");
-//     while(1) {
-//         c = getchar();
-//         // terminate when "." is pressed
-//         if(c == '.') {
-//             system("stty cooked");
-//             exit(0);
-//         }  
-//         std::cout << c << std::endl;
-//     }
-// }
