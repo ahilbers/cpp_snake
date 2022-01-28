@@ -7,6 +7,14 @@
 #include <thread>
 
 
+void print_vector(std::vector<char> mydeque) {
+  for (auto i : mydeque) {
+    std::cout << i << " ";
+  }
+  std::cout << std::endl;
+}
+
+
 void print_deque(std::deque<int> mydeque) {
   for (auto i : mydeque) {
     std::cout << i << " ";
@@ -163,18 +171,13 @@ class Map {
 };
 
 
-void get_clock_ticks(int Z) {
-    for (int i = 0; i < Z; i++) {
-        std::cout << "Tick " << i << std::endl;
-        usleep(1000000);
-    }
-}
-
-
-void print_input_back() {
-    char x;
-    std::cin >> x;
-    std::cout << "User input is " << x << std::endl;
+void cout_clock_ticks(int pause, int value) {
+  int i = 0;
+  while (true) {
+    std::cout << "Tick " << i << ", value " << value << "\r" << std::endl;
+    usleep(pause);  // Time between ticks in microseconds
+    i++;
+  }
 }
 
 
@@ -202,65 +205,41 @@ void play_game() {
     snake.update_location(grow);
     usleep(pause);
   }
-
-  // char c;
-  // // Set the terminal to raw mode
-  // system("stty raw");
-  // while(1) {
-  //     c = getchar();
-  //     // terminate when '.' is pressed
-  //     if(c == '.') {
-  //         system("stty cooked");
-  //         std::cout << std::endl;
-  //         exit(0);
-  //     }  
-  //     std::cout << c << "\033[A" << std::endl;  // print c and move cursor up
 }
-
 
 
 int main() {
 
-  char c;
-  bool game_live;
-  const int num_rounds = 10;
-  int round_num;
+  int pause = 1000000;  // Time between ticks, in milliseconds
+  int value;
+  value = 0;
+  std::thread ticker(cout_clock_ticks, pause, value);  // Keeps track of time
 
-  game_live = true;
+  value++;
+  std::cout << value << std::endl;
 
-  // // Thread that measures time go by
-  // std::thread ticker(get_clock_ticks, 10);
-  // usleep(500000);
-
-  std::deque<int> command_list;
+  char input_char;
+  std::vector<char> command_list;
 
   // Set terminal to raw mode to read input without having to press ENTER
   system("stty raw");
-  round_num = 0;
-  while(game_live) {
-    command_list.push_front(round_num);
-    std::cout << "Hello " << round_num << "\r" << std::endl;
-    print_deque(command_list);
-    usleep(1000000);
-    round_num++;
-    command_list.pop_back();
-    if (round_num > num_rounds) {
-      game_live = false;
+  while(true) {
+
+    input_char = getchar();
+
+    // terminate when '.' is pressed
+    if (input_char == '.') {
+      system("stty cooked");  // Return terminal to normal mode
+      std::cout << std::endl;
+      exit(0);
     }
+
+    command_list.push_back(input_char);
+    print_vector(command_list);
+    std::cout << "\r";  // Move cursor back to beginning of line
   }
-  system("stty cooked");
 
-  
-
-  // usleep(500000);
-  // for (int i=0; i<10; i++) {
-  //   print_input_back();
-  // }
-  // std::thread th2(func_thread2, 3);
-
-  // Wait for the threads to finish
-  // ticker.join();
-  // th2.join();
+  ticker.join();
 
   return 0;
 
