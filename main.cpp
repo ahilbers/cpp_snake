@@ -171,17 +171,7 @@ class Map {
 };
 
 
-void cout_clock_ticks(int pause, int value) {
-  int i = 0;
-  while (true) {
-    std::cout << "Tick " << i << ", value " << value << "\r" << std::endl;
-    usleep(pause);  // Time between ticks in microseconds
-    i++;
-  }
-}
-
-
-void play_game() {
+void play_game_orig() {
 
   // Map properties
   const int map_side_length = 11;  // keep odd so map has a middle
@@ -208,39 +198,48 @@ void play_game() {
 }
 
 
-int main() {
-
-  int pause = 1000000;  // Time between ticks, in milliseconds
-  int value;
-  value = 0;
-  std::thread ticker(cout_clock_ticks, pause, value);  // Keeps track of time
-
-  value++;
-  std::cout << value << std::endl;
-
-  char input_char;
-  std::vector<char> command_list;
-
-  // Set terminal to raw mode to read input without having to press ENTER
-  system("stty raw");
+// Read user input characters 
+void read_user_input(char* user_input_pointer) {
+  system("stty raw");  // Set terminal to raw mode, read input without ENTER
   while(true) {
-
-    input_char = getchar();
-
-    // terminate when '.' is pressed
-    if (input_char == '.') {
+    *user_input_pointer = getchar();
+    if (*user_input_pointer == '.') { // Terminate when '.' is pressed
       system("stty cooked");  // Return terminal to normal mode
       std::cout << std::endl;
       exit(0);
     }
+  }
+}
 
-    command_list.push_back(input_char);
-    print_vector(command_list);
-    std::cout << "\r";  // Move cursor back to beginning of line
+
+void play_game() {
+
+  // Game properties
+  int pause = 1000000;  // Step length, microseconds
+
+  // Variables
+  char user_input;
+
+  // Instantiate user input
+  user_input = '0';
+
+  // Create a thread that always runs and reads in user input characters
+  std::thread user_input_stream(read_user_input, &user_input);
+  
+  // Every step, print number of steps and user input -- '0' if none entered
+  int i = 0;
+  while (true) {
+    std::cout << "Tick " << i << ", value " << user_input << "\r" << std::endl;
+    user_input = '0';  // Reset value
+    usleep(pause);
+    i++;
   }
 
-  ticker.join();
+  user_input_stream.join();
+};
 
+
+int main() {
+  play_game();
   return 0;
-
 };
