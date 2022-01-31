@@ -28,12 +28,12 @@ class Snake {
   private:
 
     int map_side_length;
-    char direction;
+    int direction;  // Use integers of arrow keys for direction
     int head_location;
     std::deque<int> locations;
 
     void update_head_location() {
-      if (direction == 'L') {
+      if (direction == 68) {
         if (head_location % map_side_length == 0) {
           head_location += map_side_length - 1;
         }
@@ -41,7 +41,7 @@ class Snake {
           head_location -= 1;
         }
       }
-      else if (direction == 'R') {
+      else if (direction == 67) {
         if (head_location % map_side_length == map_side_length - 1) {
           head_location -= map_side_length - 1;
         }
@@ -49,7 +49,7 @@ class Snake {
           head_location += 1;
         }
       }
-      else if (direction == 'U') {
+      else if (direction == 65) {
         if (head_location / map_side_length == 0) {
           head_location += (map_side_length - 1) * map_side_length;
         }
@@ -57,7 +57,7 @@ class Snake {
           head_location -= map_side_length;
         }
       }
-      else if (direction == 'D') {
+      else if (direction == 66) {
         head_location += map_side_length;
       };
 
@@ -69,7 +69,7 @@ class Snake {
 
     Snake(int map_side_length) : map_side_length(map_side_length) {
       // Initialise snake, in the middle of the grid and facing right
-      direction = 'R';
+      direction = 67;
       head_location = {
         map_side_length * (int)(map_side_length / 2)
         + (int)(map_side_length / 2)
@@ -79,13 +79,13 @@ class Snake {
     };
 
     void update_direction(char direction_input) {
-      if (direction == 'L' || direction == 'R') {
-        if (direction_input == 'U' || direction_input == 'D') {
+      if (direction == 67 || direction == 68) {
+        if (direction_input == 65 || direction_input == 66) {
           direction = direction_input;
         }
       }
-      else if (direction == 'U' || direction == 'D') {
-        if (direction_input == 'L' || direction_input == 'R') {
+      else if (direction == 65 || direction == 66) {
+        if (direction_input == 67 || direction_input == 68) {
           direction = direction_input;
         }
       }
@@ -138,7 +138,7 @@ class Map {
     // Render horizontal edge, used at top and bottom of map
     void render_horizontal_edge () {
       for (int i=0; i<map_side_length+2; i++) {std::cout << solid_block;};
-      std::cout << std::endl;
+      std::cout << std::endl << "\r";
     };
 
   public:
@@ -162,7 +162,7 @@ class Map {
           else {std::cout << space;};
           ms_idx++;
         }
-        std::cout << solid_block << std::endl;
+        std::cout << solid_block << std::endl << "\r";
       }
       render_horizontal_edge();
       
@@ -171,35 +171,8 @@ class Map {
 };
 
 
-void play_game_orig() {
-
-  // Map properties
-  const int map_side_length = 11;  // keep odd so map has a middle
-
-  // Run properties
-  int pause = 1000000;  // pause in microseconds
-  int num_ts = 10;
-
-  char command;
-  std::deque<int> command_list;
-
-  Snake snake(map_side_length);
-  Map map(map_side_length);
-  bool grow;
-
-  for (int step=0; step<num_ts; step++) {
-    std::cout << "\x1b[2J\x1b[H";  // clear screen and move cursor to top
-    map.render(snake);
-    grow = step % 8 == 0;
-    if (step % 7 == 2) {snake.update_direction('U');}
-    snake.update_location(grow);
-    usleep(pause);
-  }
-}
-
-
 // Read user input characters 
-void read_user_input(char* user_input_pointer) {
+void read_user_input(int* user_input_pointer) {
   system("stty raw");  // Set terminal to raw mode, read input without ENTER
   while(true) {
     *user_input_pointer = getchar();
@@ -215,27 +188,37 @@ void read_user_input(char* user_input_pointer) {
 void play_game() {
 
   // Game properties
-  int pause = 1000000;  // Step length, microseconds
+  int pause = 100000;  // Step length, microseconds
 
-  // Variables
-  char user_input;
+  // variables
+  int user_input;
 
-  // Instantiate user input
-  user_input = '0';
+  // instantiate user input
+  user_input = 0;
 
-  // Create a thread that always runs and reads in user input characters
+  // create a thread that always runs and reads in user input characters
   std::thread user_input_stream(read_user_input, &user_input);
-  
-  // Every step, print number of steps and user input -- '0' if none entered
-  int i = 0;
+
+  // Map properties
+  const int map_side_length = 11;  // keep odd so map has a middle
+
+  Snake snake(map_side_length);
+  Map map(map_side_length);
+  bool grow_this_round;
+
+  int round_num = 0;
   while (true) {
-    std::cout << "Tick " << i << ", value " << user_input << "\r" << std::endl;
-    user_input = '0';  // Reset value
+    std::cout << "\x1b[2J\x1b[H";  // clear screen and move cursor to top
+    grow_this_round = {round_num %8 == 0};
+    snake.update_direction(user_input);
+    snake.update_location(grow_this_round);
+    map.render(snake);
+    std::cout << "\r" << std::endl;
+    round_num++;
     usleep(pause);
-    i++;
   }
 
-  user_input_stream.join();
+  // user_input_stream.join();
 };
 
 
