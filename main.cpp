@@ -23,17 +23,32 @@ void print_deque(std::deque<int> mydeque) {
 }
 
 
+class Egg {
+
+  private:
+    const int map_side_length;
+    int location;
+
+  public:
+    Egg(int map_side_length) : map_side_length(map_side_length) {
+      // Initialise egg, two blocks up from the middle of the grid
+      location = 
+    }
+
+  
+    
+}
+
+
 class Snake {
 
   private:
-
-    int map_side_length;
-    int direction;  // Use integers of arrow keys for direction
+    const int map_side_length;
+    int direction;  // Use integers for direction (left: 68, right: 67, up: 65, down: 66)
     int head_location;
     std::deque<int> locations;
-
     void update_head_location() {
-      if (direction == 68) {
+      if (direction == 68) {  // left
         if (head_location % map_side_length == 0) {
           head_location += map_side_length - 1;
         }
@@ -41,7 +56,7 @@ class Snake {
           head_location -= 1;
         }
       }
-      else if (direction == 67) {
+      else if (direction == 67) {  // right
         if (head_location % map_side_length == map_side_length - 1) {
           head_location -= map_side_length - 1;
         }
@@ -49,7 +64,7 @@ class Snake {
           head_location += 1;
         }
       }
-      else if (direction == 65) {
+      else if (direction == 65) {  // up
         if (head_location / map_side_length == 0) {
           head_location += (map_side_length - 1) * map_side_length;
         }
@@ -57,16 +72,14 @@ class Snake {
           head_location -= map_side_length;
         }
       }
-      else if (direction == 66) {
+      else if (direction == 66) {  // down
         head_location += map_side_length;
       };
-
-      // Keep the snake on the map
+      // Keep snake on map
       head_location = head_location % (map_side_length * map_side_length);
     }
 
   public:
-
     Snake(int map_side_length) : map_side_length(map_side_length) {
       // Initialise snake, in the middle of the grid and facing right
       direction = 67;
@@ -77,7 +90,6 @@ class Snake {
       locations.push_front(head_location-1);
       locations.push_front(head_location);
     };
-
     void update_direction(char direction_input) {
       if (direction == 67 || direction == 68) {
         if (direction_input == 65 || direction_input == 66) {
@@ -90,22 +102,18 @@ class Snake {
         }
       }
     };
-
     void update_location(bool grow=false) {
       // Update snake's location deque after a step forward
       update_head_location();
       locations.push_front(head_location);
       if (not grow) {
         locations.pop_back();
-      }
-      
-    }
-
-    // Get snake's grid locations -- first entry is head, others are body
+      } 
+    };
     std::deque<int> get_locations() {
+      // Get snake's grid locations -- first entry is head, others are body
       return locations;
     };
-
 
 };
 
@@ -116,6 +124,7 @@ class Map {
     const int map_side_length;
     std::string solid_block = "\u2588\u2588";
     std::string shade_block = "\u2593\u2593";
+    std::string egg_block = "\u25d6\u25d6";
     std::string space = "  ";
     std::string map_string;  // Contains what is at each grid location
 
@@ -127,12 +136,17 @@ class Map {
         map_string[i] = ' ';
       }
 
-      // Get snake's locations and add them
+      // Get snake locations and add them
       std::deque<int> snake_locations = snake.get_locations();
       map_string[snake_locations[0]] = 'H';  // Add snake's head
       for (int i=1; i<snake_locations.size(); i++) {
         map_string[snake_locations[i]] = 'S';  // Add snake's body
       };
+
+      // Get egg location and add to map
+      print_deque(snake_locations);
+      std::cout << "\n" << std::endl << "\r";
+
     };
 
     // Render horizontal edge, used at top and bottom of map
@@ -189,27 +203,29 @@ void play_game() {
 
   // Game properties
   int pause = 100000;  // Step length, microseconds
+  const int map_side_length = 15;  // keep odd so map has a middle
 
-  // variables
+  // Variables
   int user_input;
-
-  // instantiate user input
-  user_input = 0;
-
-  // create a thread that always runs and reads in user input characters
-  std::thread user_input_stream(read_user_input, &user_input);
-
-  // Map properties
-  const int map_side_length = 11;  // keep odd so map has a middle
-
+  bool grow_this_round;
   Snake snake(map_side_length);
   Map map(map_side_length);
-  bool grow_this_round;
+
+  // Instantiate user input
+  user_input = 0;
+
+  // Create thread that always runs and reads in user input characters
+  std::thread user_input_stream(read_user_input, &user_input);
+  
+
+  
+  
 
   int round_num = 0;
   while (true) {
     std::cout << "\x1b[2J\x1b[H";  // clear screen and move cursor to top
-    grow_this_round = {round_num %8 == 0};
+    // grow_this_round = {round_num %8 == 0};
+    grow_this_round = false;
     snake.update_direction(user_input);
     snake.update_location(grow_this_round);
     map.render(snake);
@@ -217,8 +233,6 @@ void play_game() {
     round_num++;
     usleep(pause);
   }
-
-  // user_input_stream.join();
 };
 
 
