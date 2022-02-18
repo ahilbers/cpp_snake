@@ -5,26 +5,7 @@
 #include <vector>
 #include <deque>
 #include <thread>
-
-
-void print_deque(std::deque<int> mydeque) {
-  for (int i : mydeque) {
-    std::cout << i << " ";
-  }
-  std::cout << std::endl;
-};
-
-
-// Read user input characters 
-void read_user_input(int* user_input_pointer) {
-  while(true) {
-    *user_input_pointer = getchar();
-    if (*user_input_pointer == '.') { // Terminate when '.' is pressed
-      exit_game();
-    }
-  }
-};
-
+#include "utils.h"
 
 class Snake {
 
@@ -228,17 +209,10 @@ class Map {
 };
 
 
-void exit_game() {
-  system("stty cooked");  // Return terminal to normal (not "raw") mode
-  std::cout << std::endl;
-  exit(0);
-}
-
-
 void play_game() {
 
   // Game properties
-  int pause = 500000;  // Step length, microseconds
+  int pause = 200000;  // Step length, microseconds
   const int map_side_length = 11;  // keep odd so map has a middle
 
   // Variables
@@ -275,9 +249,6 @@ void play_game() {
     // Move the snake
     snake.update_direction(user_input);
     snake.update_location(grow_this_round);
-
-    print_deque(snake_locations);
-    std::cout << "\r" << egg_location << std::endl << "\r" << std::endl;
 
     map.render(snake, egg);
 
