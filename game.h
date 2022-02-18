@@ -17,7 +17,6 @@ namespace game{
       void update_head_location();
     public:
       Snake(int map_side_length); 
-      // Snake(int map_side_length) : map_side_length(map_side_length) // TODO: Remove!!
       bool is_at_location(int location);
       std::deque<int> get_locations();
       void update_direction(char direction_input);
@@ -35,7 +34,6 @@ namespace game{
       bool is_valid_new_location;
     public:
       Egg(int map_side_length);
-      // Egg(int map_side_length) : map_side_length(map_side_length);  // TODO: Remove!!
       int get_location();
       void update_location(Snake snake);
   };
@@ -55,7 +53,6 @@ namespace game{
       void render_horizontal_edge();
     public:
       Map(int map_side_length);
-      // Map(int map_side_length) : map_side_length(map_side_length);  // TODO: Remove!!
       void render(Snake snake, Egg egg);
   };
 
