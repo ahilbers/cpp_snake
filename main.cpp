@@ -23,16 +23,18 @@ void play_game() {
   int egg_location;
   int user_input;
   bool grow_this_round;
-
-  user_input = 0;  // Instantiate user input
+  int num_steps;
+  int score;
 
   // Background thread, reads user input characters
   system("stty raw");  // Set terminal to raw mode, read input without ENTER
+  user_input = 0;  // Instantiate user input
   std::thread user_input_stream(utils::read_user_input, &user_input);
 
   // Play game
-  int round_num = 0;
-  while (true) {
+  num_steps = 0;
+  score = 0;
+  while (snake.is_alive) {
     std::cout << "\x1b[2J\x1b[H";  // Clear screen and move cursor to top
 
     // Get variables
@@ -44,6 +46,7 @@ void play_game() {
     if (snake_locations[0] == egg_location) {
       egg.update_location(snake);
       grow_this_round = true;
+      score++;
     }
 
     // Move snake
@@ -51,9 +54,17 @@ void play_game() {
     snake.update_location(grow_this_round);
     map.render(snake, egg);
 
-    round_num++;
+    // Display score and time
+    std::cout << "Steps: " << num_steps << std::endl << "\r";
+    std::cout << "Score: " << score << std::endl << "\r";
+
+    num_steps++;
     usleep(pause);
-  }
+  };
+
+  // If snake has died, end the game
+  std::cout << "Game over!" << std::endl;
+  utils::exit_game();
 };
 
 

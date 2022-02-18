@@ -9,12 +9,12 @@ namespace game{
 
   Snake::Snake(int map_side_length) : map_side_length(map_side_length) {
     // Initialise snake in middle of grid, facing right
+    is_alive = true;
     direction = 67;
     head_location = {
       map_side_length * (int)(map_side_length / 2)
       + (int)(map_side_length / 2)
     };
-    locations.push_front(head_location-1);
     locations.push_front(head_location);
   };
 
@@ -53,10 +53,9 @@ namespace game{
     // Keep snake on map
     head_location = head_location % (map_side_length * map_side_length);
 
-    // If new head location is in snake, end the game
+    // If new head location is in snake, the snake has died
     if (is_at_location(head_location)) {
-      std::cout << "Game over!" << std::endl;
-      utils::exit_game();
+      is_alive = false;
     }
   }
   

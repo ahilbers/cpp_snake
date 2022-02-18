@@ -16,13 +16,12 @@ namespace game{
       std::deque<int> locations;
       void update_head_location();
     public:
-      Snake(int map_side_length); 
+      Snake(int map_side_length);
+      bool is_alive;
       bool is_at_location(int location);
       std::deque<int> get_locations();
       void update_direction(char direction_input);
       void update_location(bool grow_this_round);
-      
-      
   };
 
 
