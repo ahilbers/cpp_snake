@@ -8,18 +8,11 @@
 
 
 void print_deque(std::deque<int> mydeque) {
-  for (auto i : mydeque) {
+  for (int i : mydeque) {
     std::cout << i << " ";
   }
   std::cout << std::endl;
 };
-
-
-void exit_game() {
-  system("stty cooked");  // Return terminal to normal (not "raw") mode
-  std::cout << std::endl;
-  exit(0);
-}
 
 
 // Read user input characters 
@@ -148,7 +141,7 @@ class Egg {
       // Keep suggesting random locations until one is found where snake isn't
       is_valid_new_location = false;
       while (!is_valid_new_location) {
-        new_location = rand() % map_side_length * map_side_length;
+        new_location = rand() % (map_side_length * map_side_length);
         is_valid_new_location = !snake.is_at_location(new_location);
       }
       location = new_location;
@@ -186,8 +179,6 @@ class Map {
       for (int i=1; i<snake_locations.size(); i++) {
         map_string[snake_locations[i]] = 'S';  // Add snake's body
       };
-      
-      // std::cout << "\n" << std::endl << "\r";
 
     };
 
@@ -235,6 +226,13 @@ class Map {
 
     };
 };
+
+
+void exit_game() {
+  system("stty cooked");  // Return terminal to normal (not "raw") mode
+  std::cout << std::endl;
+  exit(0);
+}
 
 
 void play_game() {
