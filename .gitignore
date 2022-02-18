@@ -1,5 +1,8 @@
 # Mac OS
 *.DS_Store
 
+# IDE
+.vscode/*
+
 # Compiled executables
 *.out
