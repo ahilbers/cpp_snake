@@ -6,97 +6,102 @@
 
 namespace game{
 
-  // class Snake {
 
-  //   private:
-  //     const int map_side_length;
-  //     int direction;  // Integer direction (left: 68, right: 67, up: 65, down: 66)
-  //     int head_location;
-  //     std::deque<int> locations;
-  //     void update_head_location() {
-  //       if (direction == 68) {  // left
-  //         if (head_location % map_side_length == 0) {
-  //           head_location += map_side_length - 1;
-  //         }
-  //         else {
-  //           head_location -= 1;
-  //         }
-  //       }
-  //       else if (direction == 67) {  // right
-  //         if (head_location % map_side_length == map_side_length - 1) {
-  //           head_location -= map_side_length - 1;
-  //         }
-  //         else {
-  //           head_location += 1;
-  //         }
-  //       }
-  //       else if (direction == 65) {  // up
-  //         if (head_location / map_side_length == 0) {
-  //           head_location += (map_side_length - 1) * map_side_length;
-  //         }
-  //         else {
-  //           head_location -= map_side_length;
-  //         }
-  //       }
-  //       else if (direction == 66) {  // down
-  //         head_location += map_side_length;
-  //       };
-  //       // Keep snake on map
-  //       head_location = head_location % (map_side_length * map_side_length);
+  Snake::Snake(int map_side_length) : map_side_length(map_side_length) {
+    // Initialise snake in middle of grid, facing right
+    direction = 67;
+    head_location = {
+      map_side_length * (int)(map_side_length / 2)
+      + (int)(map_side_length / 2)
+    };
+    locations.push_front(head_location-1);
+    locations.push_front(head_location);
+  };
 
-  //       // If new head location is in snake, end the game
-  //       if (is_at_location(head_location)) {
-  //         std::cout << "Game over!" << std::endl;
-  //         exit_game();
-  //       }
-  //     }
 
-  //   public:
-  //     Snake(int map_side_length) : map_side_length(map_side_length) {
-  //       // Initialise snake, in the middle of the grid and facing right
-  //       direction = 67;
-  //       head_location = {
-  //         map_side_length * (int)(map_side_length / 2)
-  //         + (int)(map_side_length / 2)
-  //       };
-  //       locations.push_front(head_location-1);
-  //       locations.push_front(head_location);
-  //     };
-  //     bool is_at_location(int location) {
-  //       // Check if any part of the snake is currently at that location
-  //       for (auto i : locations) {
-  //         if (i == location) {
-  //           return true;
-  //         }
-  //       }
-  //       return false;
-  //     }
-  //     void update_direction(char direction_input) {
-  //       if (direction == 67 || direction == 68) {
-  //         if (direction_input == 65 || direction_input == 66) {
-  //           direction = direction_input;
-  //         }
-  //       }
-  //       else if (direction == 65 || direction == 66) {
-  //         if (direction_input == 67 || direction_input == 68) {
-  //           direction = direction_input;
-  //         }
-  //       }
-  //     };
-  //     void update_location(bool grow=false) {
-  //       // Update snake's location deque after a step forward
-  //       update_head_location();
-  //       locations.push_front(head_location);
-  //       if (not grow) {
-  //         locations.pop_back();
-  //       } 
-  //     };
-  //     std::deque<int> get_locations() {
-  //       // Get snake's grid locations -- first entry is head, others are body
-  //       return locations;
-  //     };
-  // };
+  void Snake::update_head_location() {
+    // Get new location of snake's head
 
+    if (direction == 68) {  // left
+      if (head_location % map_side_length == 0) {
+        head_location += map_side_length - 1;
+      }
+      else {
+        head_location -= 1;
+      }
+    }
+    else if (direction == 67) {  // right
+      if (head_location % map_side_length == map_side_length - 1) {
+        head_location -= map_side_length - 1;
+      }
+      else {
+        head_location += 1;
+      }
+    }
+    else if (direction == 65) {  // up
+      if (head_location / map_side_length == 0) {
+        head_location += (map_side_length - 1) * map_side_length;
+      }
+      else {
+        head_location -= map_side_length;
+      }
+    }
+    else if (direction == 66) {  // down
+      head_location += map_side_length;
+    };
+
+    // Keep snake on map
+    head_location = head_location % (map_side_length * map_side_length);
+
+    // If new head location is in snake, end the game
+    if (is_at_location(head_location)) {
+      std::cout << "Game over!" << std::endl;
+      utils::exit_game();
+    }
+  }
+  
+
+  bool Snake::is_at_location(int location) {
+    // Check if any part of the snake is currently at that location
+    for (auto i : locations) {
+      if (i == location) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+
+  std::deque<int> Snake::get_locations() {
+    // Get snake's grid locations -- first entry is head, others are body
+    return locations;
+  };
+
+
+  void Snake::update_direction(char direction_input) {
+    // Update the direction in which snake is travelling
+    if (direction == 67 || direction == 68) {
+      if (direction_input == 65 || direction_input == 66) {
+        direction = direction_input;
+      }
+    }
+    else if (direction == 65 || direction == 66) {
+      if (direction_input == 67 || direction_input == 68) {
+        direction = direction_input;
+      }
+    }
+  };
+
+
+  void Snake::update_location(bool grow) {
+    // Update snake's locations after step forward
+    update_head_location();
+    locations.push_front(head_location);
+    if (not grow) {
+      locations.pop_back();
+    } 
+  };
+  
 
   Egg::Egg(int map_side_length) : map_side_length(map_side_length) {
     // Initialise egg, two blocks up from middle of grid
