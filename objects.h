@@ -5,8 +5,7 @@
 #include "game.h"
 
 
-namespace game{
-
+namespace objects{
 
   class Snake {
     private:
@@ -41,10 +40,10 @@ namespace game{
   class Map {
     private:
       const int map_side_length;
-      std::string solid_block = "\u2588\u2588";
-      std::string shade_block = "\u2593\u2593";
-      std::string egg_block = "()";
-      std::string space = "  ";
+      const std::string solid_block = "\u2588\u2588";
+      const std::string shade_block = "\u2593\u2593";
+      const std::string egg_block = "()";
+      const std::string space = "  ";
       std::deque<int> snake_locations;
       int egg_location;
       std::string map_string;  // Contains what is at each grid location
@@ -54,6 +53,5 @@ namespace game{
       Map(int map_side_length);
       void render(Snake snake, Egg egg);
   };
-
 
 }
