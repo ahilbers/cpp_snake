@@ -5,8 +5,8 @@
 #include <vector>
 #include <deque>
 #include <thread>
-#include "utils.h"  // exit_game, read_user_input
-#include "game.h"  // Snake, Egg, Map
+#include "game.h"  // exit_game, read_user_input
+#include "objects.h"  // Snake, Egg, Map
 
 
 void play_game() {
@@ -55,8 +55,8 @@ void play_game() {
     map.render(snake, egg);
 
     // Display score and time
-    std::cout << "Steps: " << num_steps << std::endl << "\r";
-    std::cout << "Score: " << score << std::endl << "\r";
+    std::cout << "Steps: " << num_steps << "\r" << std::endl;
+    std::cout << "Score: " << score << "\r" << std::endl;
 
     num_steps++;
     usleep(pause);
