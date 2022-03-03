@@ -9,8 +9,9 @@ To create the game, run
 sh compile.sh
 ```
 
-This should work from a terminal on Mac (and probably also Linux). For Windows,
-you'll have to change `compile.sh` and run a different command.
+This should work from a terminal on Mac. For Windows, and Linux,
+you'll have to change the compiler in `compile.sh`, e.g. to `g++`
+(and probably also change the flags).
 
 
 ### Playing the game
