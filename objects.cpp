@@ -4,7 +4,7 @@
 #include "objects.h"
 
 
-namespace objects{
+namespace objects {
 
 
   Snake::Snake(int map_side_length) : map_side_length(map_side_length) {
