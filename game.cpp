@@ -92,8 +92,8 @@ namespace game {
       snake.update_location(grow_this_round);
       map.render(snake, egg);
 
+      // Display to screen and pause before next step
       display_status(map_side_length, num_steps, score);
-
       num_steps++;
       usleep(pause);
     };
