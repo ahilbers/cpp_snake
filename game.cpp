@@ -49,7 +49,7 @@ namespace game {
 
     // Game properties
     int pause = 100000;  // Step length, microseconds
-    const int map_side_length = 11;  // keep odd so map has a middle
+    const int map_side_length = 15;  // keep odd so map has a middle
 
     // Variables
     objects::Snake snake(map_side_length);
