@@ -5,7 +5,7 @@
 #include "game.h"
 
 
-namespace objects{
+namespace objects {
 
   class Snake {
     private:

@@ -1,5 +1,6 @@
 #include <unistd.h>
 #include <thread>
+#include "settings.h"  // pause, map_side_length
 #include "game.h"  // exit_game, read_user_input, play_game
 #include "objects.h"  // Snake, Egg, Map
 
@@ -47,14 +48,10 @@ namespace game {
 
   void play_game() {
 
-    // Game properties
-    int pause = 100000;  // Step length, microseconds
-    const int map_side_length = 15;  // keep odd so map has a middle
-
     // Variables
-    objects::Snake snake(map_side_length);
-    objects::Egg egg(map_side_length);
-    objects::Map map(map_side_length);
+    objects::Snake snake(settings::map_side_length);
+    objects::Egg egg(settings::map_side_length);
+    objects::Map map(settings::map_side_length);
     std::deque<int> snake_locations;
     int egg_location;
     int user_input;
@@ -93,9 +90,9 @@ namespace game {
       map.render(snake, egg);
 
       // Display to screen and pause before next step
-      display_status(map_side_length, num_steps, score);
+      display_status(settings::map_side_length, num_steps, score);
       num_steps++;
-      usleep(pause);
+      usleep(settings::pause);
     };
 
     // If snake has died, end the game
