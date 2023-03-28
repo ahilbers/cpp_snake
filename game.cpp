@@ -59,8 +59,6 @@ namespace game {
     int num_steps;
     int score;
 
-    std::cout << 2 << std::endl;
-
     start_game(snake, egg, map);
 
     // Background thread, reads user input characters
