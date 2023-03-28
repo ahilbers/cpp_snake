@@ -48,10 +48,6 @@ namespace game {
 
   void play_game() {
 
-    // Game properties
-    int pause = 100000;  // Step length, microseconds
-    // const int map_side_length = 15;  // keep odd so map has a middle
-
     // Variables
     objects::Snake snake(settings::map_side_length);
     objects::Egg egg(settings::map_side_length);
@@ -98,7 +94,7 @@ namespace game {
       // Display to screen and pause before next step
       display_status(settings::map_side_length, num_steps, score);
       num_steps++;
-      usleep(pause);
+      usleep(settings::pause);
     };
 
     // If snake has died, end the game
